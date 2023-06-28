@@ -2,13 +2,13 @@
 
 ## Lab 1 Calculations
 
-For this lab, we'll do the calculations for items 5 (signal to noise and exposure time) and 6 (total time) in this notebook.
+#For this lab, we'll do the calculations for items 5 (signal to noise and exposure time) and 6 (total time) in this notebook.
 
-### Exposure time to reach a desired signal-to-noise ratio
+# Exposure time to reach a desired signal-to-noise ratio
 
-In this calculation we have the experience of a reference observation to draw upon, which constraints the relationships beteween source brightness, exposure time, and signal-to-noise ratio.
+#In this calculation we have the experience of a reference observation to draw upon, which constraints the relationships beteween source brightness, exposure time, and signal-to-noise ratio.
 
-First you'll have to do some algebraic manipulation.  Then fill in the code below.
+#First you'll have to do some algebraic manipulation.  Then fill in the code below.
 
 # define variables for reference observation
 m_ref = 12.41 # [mag]
@@ -32,9 +32,9 @@ print("Exposure time to reach SNR={}: {}".format(SNR_targ, t_targ))
 
 ### Total time for observations
 
-Here we're going to calculate the total time needed.  We're getting data in 3 filters ($B$, $V$, and $R$), with 10 s of overhead per exposure.  We need to calculate a couple of quantities, namely
- * the time for obtaining 3 exposures, one in each filter, and
- * once we know the pulsation period, how many exposures in each filter we expect to obtain.
+#Here we're going to calculate the total time needed.  We're getting data in 3 filters ($B$, $V$, and $R$), with 10 s of overhead per exposure.  We need to calculate a couple of quantities, namely
+ #* the time for obtaining 3 exposures, one in each filter, and
+ #* once we know the pulsation period, how many exposures in each filter we expect to obtain.
  
 
 t_over = 10. # [s] overhead time
