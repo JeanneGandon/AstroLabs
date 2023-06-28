@@ -1,52 +1,369 @@
-# Lab 1: Telescope Proposal
-
-## Lab 1 Calculations
-
-For this lab, we'll do the calculations for items 5 (signal to noise and exposure time) and 6 (total time) in this notebook.
-
-### Exposure time to reach a desired signal-to-noise ratio
-
-In this calculation we have the experience of a reference observation to draw upon, which constraints the relationships beteween source brightness, exposure time, and signal-to-noise ratio.
-
-First you'll have to do some algebraic manipulation.  Then fill in the code below.
-
-# define variables for reference observation
-m_ref = 12.41 # [mag]
-t_ref = 700. # [s]   NOTE  here we use a period to indicate the number is not necessarily an integer.  This is a good habit.
-SNR_ref = 151.
-# constant for flux-magnitude relationship
-F0 = 3.530e-20 # [erg/s/cm2]
-
-F_ref = F0 * 10.**(-m_ref/2.5) # [erg/s/cm2]
-
-# parameters for our observation
-SNR_targ = 10.
-m_targ = 11.16 # [mag]  NOTE here you need to fill in the expression, or there will be an error here.
-F_targ = F0 * 10.**(-m_targ/2.5)
-t_targ = ((SNR_targ**2)*(F_ref**2)*(t_ref))/((SNR_ref**2)*(F_targ**2)) # [s]  NOTE here you need to fill in the expression, or there will be an error here.
-
-# Let's print the results.  Notice the funny syntax.  Every instance of {} gets replaced with the argument of the format statement.
-print("Target magnitude: {}".format(m_targ))
-print("Exposure time to reach SNR={}: {}".format(SNR_targ, t_targ))
-
-
-### Total time for observations
-
-Here we're going to calculate the total time needed.  We're getting data in 3 filters ($B$, $V$, and $R$), with 10 s of overhead per exposure.  We need to calculate a couple of quantities, namely
- * the time for obtaining 3 exposures, one in each filter, and
- * once we know the pulsation period, how many exposures in each filter we expect to obtain.
- 
-
-t_over = 10. # [s] overhead time
-n_filt = 3 # number of filters
-t_pulse = 88*60  # [s] pulsation period  NOTE here you need to fill in the expression, or there will be an error here.  Also note the units!
-
-t_3exp = n_filt * (t_targ+t_over)  # [s] time for one exposure in each filter.  NOTE here you need to fill in the expression, or there will be an error here.
-print() #  NOTE  print out the time
-
-import numpy as np
-# the np.round() function rounds the value to the nearest integer value (though it still returns a floating point value, e.g. 5.0)
-# the int() function converts the value to an integer
-n_meas = int(np.round(t_pulse / t_3exp )) # number of measurements in each filter.  NOTE here you need to fill in the expression, or there will be an error here.
-print(n_meas) #  NOTE  print out the number of measurements
-
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "zrq-aNx_qywZ"
+      },
+      "source": [
+        "# Lab 1: Telescope Proposal\n",
+        "\n",
+        "This is the Jupyter notebook for Lab 1.  We'll break it into two main parts; a very brief introduction to computing with Python and Jupyter, as well as a section on some of the calculations to perform in Lab 1.\n",
+        "\n",
+        "For grading purposes, only the items in the section \"Lab 1 Calculations\" will be examined.\n",
+        "\n",
+        "## Introduction to Python\n",
+        "\n",
+        "Python is a powerful programming language that can be used in a wide array of applications. These next few tutorial examples will guide you through the basics of arithmetic using Python.  We'll do more advanced programming structures and analysis techniques in future labs.\n",
+        "\n",
+        "It is highly encouraged that go out on your own and learn to write programs and functions for Python by following some of the numerous coding tutorials available online.\n",
+        "\n",
+        "For this class, even if you have your own distribution of Python, we highly recommend using the online Jupyter notebooks on `vega` to execute your code, as it will make it much easier for the instructors to help you in debugging (since we have access to these as well).\n",
+        "\n",
+        "## Introduction to Jupyter\n",
+        "\n",
+        "In this class, we will be interacting with Python through these Jupyter notebooks.  Jupyter is an interface to python that allows a mixture of text and python code and execution results.  \n",
+        "\n",
+        "Jupyter is made up of different cells with a mixture of input and output.  You can select a cell by clicking on it.  If you double click on the gray-shaded boxes, you can edit the cell's input.\n",
+        "\n",
+        "In this class we'll use cells of two different types, \"Markdown\" and \"Code,\" which in this case is Python.  Markdown is essentially text that has some formatting capability.  (You can change the type of a cell with the dropdown menu above.)\n",
+        "\n",
+        "To format text or execute code once you are done editing the input cell, just press SHIFT+ENTER and the cell will execute.\n",
+        "\n",
+        "Try it with the next code cell.  Click on it to make sure the cell is highlighted (feel free to double click to edit, though you won't need to).  Then press SHIFT+ENTER, and you should see `Hello World!` in the output."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "dTBk1Tveqywc",
+        "outputId": "30e74d84-1734-46b5-e937-e202b00d9060"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "Hello World!\n"
+          ]
+        }
+      ],
+      "source": [
+        "# Comments begin with the # symbol.  They can be alone on a line,\n",
+        "x = 'Hello World!' # or follow an expression.  This expression gives the 'x' variable the value of a character string.\n",
+        "print(x)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "Vfw14AuPqywe"
+      },
+      "source": [
+        "## Some Python Basics\n",
+        "\n",
+        "Note that in the cell above, we defined a variable `x`.  In Python variables are not \"strictly typed,\" meaning they can be anything you want.  For example,"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "ja-P9i5Tqywe",
+        "outputId": "80ba6d23-84d9-47fa-b2c7-5aea466bf648"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "star\n"
+          ]
+        }
+      ],
+      "source": [
+        "y = 25  # y is the value 25\n",
+        "y = 'star' # now it is the value of the character string 'star'\n",
+        "print(y)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "mcBLcRGrqywf"
+      },
+      "source": [
+        "Notice how we can use the `print()` command to output the value of the variable.  This command can take more than one argument,"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "tbMCGoOPqywf",
+        "outputId": "ae2fba8c-bfb8-4617-d146-0b74200cb036"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "twinkle 45 1500.0\n"
+          ]
+        }
+      ],
+      "source": [
+        "print('twinkle', 45, 1.5e3)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "7zDFt65Nqywg"
+      },
+      "source": [
+        "We can also do some more fancy formatting by substituting the values of variables into character strings, then outputting the latter.  But more on that later.\n",
+        "\n",
+        "Let's use Python to do some simple calculations."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "AoBuew6sqywh",
+        "outputId": "fa7b601a-c572-4ff9-eb0f-50eeaeebf27d"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "77\n",
+            "336.65000000000003\n",
+            "626.78\n",
+            "1.3333333333333333\n",
+            "20.25\n",
+            "3.0\n"
+          ]
+        }
+      ],
+      "source": [
+        "print(45 + 32) # addition\n",
+        "print(345.85 - 9.20) # subtraction\n",
+        "print(5 * 125.356) # multiplication\n",
+        "print(4./3.) # division\n",
+        "print(4.5**2) # exponentiation\n",
+        "\n",
+        "x = 3.5\n",
+        "m = 1.\n",
+        "b = -.5\n",
+        "y = m*x + b\n",
+        "print(y)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "g8B0TyNqqywh"
+      },
+      "source": [
+        "There are more advanced numerical routines as part of the `numpy` (Numerical Python) library.\n",
+        "\n",
+        "We must first `import` those routines in order to use them.  Since we will likely use them often, and `numpy` is a lot of characters to type, we'll rename it something shorter, like `np`.\n",
+        "\n",
+        "Let's try calculating $e^3$."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "6y-EaKzxqywi",
+        "outputId": "04662e44-bea1-427c-cb4c-82feb534ba06"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "20.085536923187668\n"
+          ]
+        }
+      ],
+      "source": [
+        "import numpy as np\n",
+        "\n",
+        "print(np.exp(3.))"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "6Fv2rsqtqywi"
+      },
+      "source": [
+        "We can also do things like take square roots or logarithms."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "buy4OxUBqywj",
+        "outputId": "4c78116a-1f06-4da6-8002-174f14632bed"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "1.7724538509055159 5.0 3.0\n"
+          ]
+        }
+      ],
+      "source": [
+        "a = np.sqrt(np.pi)\n",
+        "b = np.log(np.exp(5.))\n",
+        "c = np.log10(1e3)\n",
+        "print(a, b, c)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "5yuxmNpBqywj"
+      },
+      "source": [
+        "## Lab 1 Calculations\n",
+        "\n",
+        "For this lab, we'll do the calculations for items 5 (signal to noise and exposure time) and 6 (total time) in this notebook.\n",
+        "\n",
+        "### Exposure time to reach a desired signal-to-noise ratio\n",
+        "\n",
+        "In this calculation we have the experience of a reference observation to draw upon, which constraints the relationships beteween source brightness, exposure time, and signal-to-noise ratio.\n",
+        "\n",
+        "First you'll have to do some algebraic manipulation.  Then fill in the code below."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "wq3rl5gTqywj",
+        "outputId": "60308580-2b4d-47b6-87df-c9910eea257f"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "Target magnitude: 11.16\n",
+            "Exposure time to reach SNR=10.0: 0.307004078768475\n"
+          ]
+        }
+      ],
+      "source": [
+        "# define variables for reference observation\n",
+        "m_ref = 12.41 # [mag]\n",
+        "t_ref = 700. # [s]   NOTE  here we use a period to indicate the number is not necessarily an integer.  This is a good habit.\n",
+        "SNR_ref = 151.\n",
+        "# constant for flux-magnitude relationship\n",
+        "F0 = 3.530e-20 # [erg/s/cm2]\n",
+        "\n",
+        "F_ref = F0 * 10.**(-m_ref/2.5) # [erg/s/cm2]\n",
+        "\n",
+        "# parameters for our observation\n",
+        "SNR_targ = 10.\n",
+        "m_targ = 11.16 # [mag]  NOTE here you need to fill in the expression, or there will be an error here.\n",
+        "F_targ = F0 * 10.**(-m_targ/2.5)\n",
+        "t_targ = ((SNR_targ**2)*(F_ref**2)*(t_ref))/((SNR_ref**2)*(F_targ**2)) # [s]  NOTE here you need to fill in the expression, or there will be an error here.\n",
+        "\n",
+        "# Let's print the results.  Notice the funny syntax.  Every instance of {} gets replaced with the argument of the format statement.\n",
+        "print(\"Target magnitude: {}\".format(m_targ))\n",
+        "print(\"Exposure time to reach SNR={}: {}\".format(SNR_targ, t_targ))\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "swDQMWznqywk"
+      },
+      "source": [
+        "### Total time for observations\n",
+        "\n",
+        "Here we're going to calculate the total time needed.  We're getting data in 3 filters ($B$, $V$, and $R$), with 10 s of overhead per exposure.  We need to calculate a couple of quantities, namely\n",
+        " * the time for obtaining 3 exposures, one in each filter, and\n",
+        " * once we know the pulsation period, how many exposures in each filter we expect to obtain.\n",
+        ""
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "1qtho_dpqywk",
+        "outputId": "c7faaf99-22e3-4162-a70f-08ee96c2b6c5"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "\n",
+            "171\n"
+          ]
+        }
+      ],
+      "source": [
+        "t_over = 10. # [s] overhead time\n",
+        "n_filt = 3 # number of filters\n",
+        "t_pulse = 88*60  # [s] pulsation period  NOTE here you need to fill in the expression, or there will be an error here.  Also note the units!\n",
+        "\n",
+        "t_3exp = n_filt * (t_targ+t_over)  # [s] time for one exposure in each filter.  NOTE here you need to fill in the expression, or there will be an error here.\n",
+        "print() #  NOTE  print out the time\n",
+        "\n",
+        "import numpy as np\n",
+        "# the np.round() function rounds the value to the nearest integer value (though it still returns a floating point value, e.g. 5.0)\n",
+        "# the int() function converts the value to an integer\n",
+        "n_meas = int(np.round(t_pulse / t_3exp )) # number of measurements in each filter.  NOTE here you need to fill in the expression, or there will be an error here.\n",
+        "print(n_meas) #  NOTE  print out the number of measurements\n",
+        "\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "ghuKNnp1qywl"
+      },
+      "outputs": [],
+      "source": []
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3 (ipykernel)",
+      "language": "python",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.8.10"
+    },
+    "colab": {
+      "provenance": []
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 0
+}
