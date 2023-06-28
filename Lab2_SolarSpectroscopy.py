@@ -1,9 +1,7 @@
 # Solar Spectroscopy
-
-## Loading and Displaying the 2d Image Data
-The first steps are to load in our data.  We'll have to specify where our data are located.
-
-For a first step, let's locate the data directory, specify a sample file and display its image.
+# Loading and Displaying the 2d Image Data
+#The first steps are to load in our data.  We'll have to specify where our data are located.
+#For a first step, let's locate the data directory, specify a sample file and display its image.
 
 data_dir = '/data/home/a180u/' # EDIT this to reflect correct path to data files
 im_fn = '14255654-2022-10-04-154848.fits'
@@ -21,11 +19,8 @@ ax.imshow(im) # the imshow() command displays 2d arrays of data
 pylab.show() # This will show the figure on the screen.
 
 
-
-
-Let's look at the above to see which rows have good data.  Since the Sun might not cover the whole slit, or the slit might be blocked on one side, or the image is off the detector, we might not get good data on all rows.  (That said, maybe you do!)
-
-Suppose rows 100 to 300 were good.  We could create a new array that had only those rows through the process of indexing, `im[100:300, :]`.  This says give us rows 100 to 300, and all columns.
+#Let's look at the above to see which rows have good data.  Since the Sun might not cover the whole slit, or the slit might be blocked on one side, or the image is off the detector, we might not get good data on all rows.  (That said, maybe you do!)
+#Suppose rows 100 to 300 were good.  We could create a new array that had only those rows through the process of indexing, `im[100:300, :]`.  This says give us rows 100 to 300, and all columns.
 
 # FIXME  change these rows to match your own data.  
 im = im[200:300, :]  # use indexing to get a subset of the original array
@@ -37,15 +32,13 @@ pylab.show()
 
 
 ## Reducing the Image to a 1d Spectrum
-
-Now we'll create a 1-dimensional array by collapsing the valid rows. We will use the `sum()` method which adds together the specified data along the specified dimension (a.k.a. "axis" in numpy-speak).
+#Now we'll create a 1-dimensional array by collapsing the valid rows. We will use the `sum()` method which adds together the specified data along the specified dimension (a.k.a. "axis" in numpy-speak).
 
 spectrum = im.sum(axis=0) # sum over all the rows to get the spectrum
 print(spectrum.shape) # check the dimensionality of the spectrum
 
-Note that the spectrum is one dimensional, with 640 elements (the x size of the detector).
-
-It is helpful for plotting and fitting to define a one-dimensional array containing the array index. First we find the size of the spectrum image and then make a 1-d index array.  We can then construct a graph of the two absorption features. 
+#Note that the spectrum is one dimensional, with 640 elements (the x size of the detector).
+#It is helpful for plotting and fitting to define a one-dimensional array containing the array index. First we find the size of the spectrum image and then make a 1-d index array.  We can then construct a graph of the two absorption features. 
 
 x = np.arange(len(spectrum)) # this gives us an array of indices
 
@@ -58,11 +51,10 @@ ax.plot(x, spectrum)
 # and show it
 pylab.draw()
 
-Hopefully we can see two absorption lines!
+#Hopefully we can see two absorption lines!
 
 ## Fitting for an individual line
-
-What we need is to fit a Gaussian to each line individually in order to measure the center of each line's position. To do this use the plot of the complete spectrum to roughly identify the center pixel. Let's pick the line on the left, and say it's roughly at $x=170$. We can zoom in on that line by plotting only a subrange of the spectrum. The `x` variable works like an index to keep the $x$ axis correct.
+#What we need is to fit a Gaussian to each line individually in order to measure the center of each line's position. To do this use the plot of the complete spectrum to roughly identify the center pixel. Let's pick the line on the left, and say it's roughly at $x=170$. We can zoom in on that line by plotting only a subrange of the spectrum. The `x` variable works like an index to keep the $x$ axis correct.
 
 fig = pylab.figure()
 ax = fig.add_subplot(111)
@@ -73,7 +65,7 @@ ax.plot(x[180:280], spectrum[180:280])
 # and show it
 pylab.draw()
 
-Next we want to use a routine being provided that fits the position of the absorption line.  It is called `fit_abs_line()`.  Again, the `x` variable is used to index the array so the values returned are for pixel locations in the original spectrum.
+#Next we want to use a routine being provided that fits the position of the absorption line.  It is called `fit_abs_line()`.  Again, the `x` variable is used to index the array so the values returned are for pixel locations in the original spectrum.
 
 import sys; sys.path.append('/home/a180i/lib/python/') # this is a temporary workaround to access the a180 module
 import a180 # import the module of routines for this class
@@ -84,11 +76,11 @@ fy, params = a180.fit_abs_line(x[180:280], spectrum[180:280])
 # Use the help feature to read more on what fit_abs_line() does. 
 help(a180.fit_abs_line)
 
-In this usage we are fitting the data from elements 140 to 200 to a quadratic background plus a Gaussian. If we print the `params` array, it contains the coefficients of the fit.
+#In this usage we are fitting the data from elements 140 to 200 to a quadratic background plus a Gaussian. If we print the `params` array, it contains the coefficients of the fit.
 
 print(params)
 
-The `params[0]` element (which is the first one listed) is the center of the Gaussian. The routine also produces an array `fy` which is the best fit function evaluated at the $x$ locations in `x[140:200]`. You can overplot this fit on top of the data. You'll again need to use the `x` variable to keep the pixel locations straight:
+#The `params[0]` element (which is the first one listed) is the center of the Gaussian. The routine also produces an array `fy` which is the best fit function evaluated at the $x$ locations in `x[140:200]`. You can overplot this fit on top of the data. You'll again need to use the `x` variable to keep the pixel locations straight:
 
 fig = pylab.figure()
 ax = fig.add_subplot(111)
@@ -100,13 +92,13 @@ ax.axvline(params[0]) # mark a vertical line at the best-fit position
 # and show it
 pylab.draw()
 
-Check that the `fy` model is a good fit to the data. If so, we should record the `params[0]` element as the position of the line you we're examining.
+#Check that the `fy` model is a good fit to the data. If so, we should record the `params[0]` element as the position of the line you we're examining.
 
-We need to repeat this procedure for the right-side spectral line.  And we need to do it for all images in our dataset.
+#We need to repeat this procedure for the right-side spectral line.  And we need to do it for all images in our dataset.
 
 ## Application to several exposures
 
-Let's look at a structure for doing the left-side lines on an entire list of files.
+#Let's look at a structure for doing the left-side lines on an entire list of files.
 
 
 # let's define a list of filenames.  This should be a list of exposures on one limb of the Sun.  We'll need to repeat this on the other limb.
@@ -158,12 +150,12 @@ left_pos = np.array(left_pos) # convert the list to a 1-d numpy array
 right_pos = np.array(right_pos)
 
 
-Now lets examine the mean and standard deviation of our measured positions.
+#Now lets examine the mean and standard deviation of our measured positions.
 
 print('left:', left_pos.mean(), left_pos.std())
 print('right:', right_pos.mean(), right_pos.std())
 
-Note we have measurements for one limb of the Sun.  We need measurements from the other limb of the Sun as well.
+#Note we have measurements for one limb of the Sun.  We need measurements from the other limb of the Sun as well.
 
 # let's define a list of filenames.  This should be a list of exposures on one limb of the Sun.  We'll need to repeat this on the other limb.
 fns = [ '14255654-2022-10-04-155148.fits', 
@@ -217,7 +209,7 @@ print('right:', right_pos.mean(), right_pos.std())
 
 ## Computing the rotation rate
 
-These steps follow the steps in your lab handout.  Don't forget to follow your uncertainties!
+#These steps follow the steps in your lab handout.  Don't forget to follow your uncertainties!
 
 # 1. Estimate the wavelength scale
 realwavediff=589.59236-588.99504
